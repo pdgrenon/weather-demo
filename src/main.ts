@@ -7,7 +7,7 @@ import { renderView, type ViewState } from './render';
 import { openMeteoClient, type WeatherClient } from './weather-client';
 
 /** Fixed for now; a location picker is a natural next feature. */
-const PLACE = { name: 'San Francisco', lat: 37.7749, lon: -122.4194 } as const;
+const PLACE = { name: 'New York City', lat: 40.7128, lon: -74.006 } as const;
 
 const FORECAST_DAYS = 3;
 
