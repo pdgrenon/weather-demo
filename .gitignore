@@ -1,0 +1,9 @@
+node_modules/
+dist/
+
+# Vite's local env override convention — the demo has no secrets today, but a
+# seeded repo shouldn't be one `git add -A` away from committing one.
+*.local
+
+# Editor / OS
+.DS_Store
