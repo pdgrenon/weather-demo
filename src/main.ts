@@ -3,7 +3,7 @@
  */
 
 import './style.css';
-import { renderView, type ViewState } from './render';
+import { renderView, unitForLocale, type ViewState } from './render';
 import { openMeteoClient, type WeatherClient } from './weather-client';
 
 /** Fixed for now; a location picker is a natural next feature. */
@@ -22,6 +22,8 @@ export async function boot(
       mount.querySelector('[data-sky]')?.getAttribute('data-sky') ?? 'neutral';
   };
 
+  const unit = unitForLocale(navigator.language);
+
   paint({ kind: 'loading' });
 
   try {
@@ -32,7 +34,7 @@ export async function boot(
     paint(
       forecast.length === 0
         ? { kind: 'empty', place: place.name }
-        : { kind: 'loaded', place: place.name, current, forecast },
+        : { kind: 'loaded', place: place.name, current, forecast, unit },
     );
   } catch (err) {
     paint({

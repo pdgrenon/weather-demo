@@ -7,9 +7,11 @@
 
 import type { CurrentWeather, DailyForecast } from './weather-client';
 
+export type TempUnit = 'C' | 'F';
+
 export type ViewState =
   | { kind: 'loading' }
-  | { kind: 'loaded'; place: string; current: CurrentWeather; forecast: DailyForecast[] }
+  | { kind: 'loaded'; place: string; current: CurrentWeather; forecast: DailyForecast[]; unit: TempUnit }
   | { kind: 'empty'; place: string }
   | { kind: 'error'; message: string };
 
@@ -25,9 +27,17 @@ export function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (c) => ESCAPES[c] ?? c);
 }
 
-/** Whole degrees Celsius. The demo has no unit toggle yet. */
-export function formatTemp(celsius: number): string {
-  return `${Math.round(celsius)}°`;
+export function celsiusToFahrenheit(celsius: number): number {
+  return (celsius * 9) / 5 + 32;
+}
+
+export function formatTemp(celsius: number, unit: TempUnit): string {
+  const value = unit === 'F' ? celsiusToFahrenheit(celsius) : celsius;
+  return `${Math.round(value)}°${unit}`;
+}
+
+export function unitForLocale(locale: string): TempUnit {
+  return /-US$/i.test(locale) ? 'F' : 'C';
 }
 
 /** Wind speed for display, rounded to whole km/h. */
@@ -73,7 +83,7 @@ function shell(state: string, sky: string, body: string): string {
   return `<section class="card" data-state="${state}" data-sky="${sky}">${body}</section>`;
 }
 
-function forecastList(days: readonly DailyForecast[]): string {
+function forecastList(days: readonly DailyForecast[], unit: TempUnit): string {
   const items = days
     .map(
       (d) => `
@@ -81,8 +91,8 @@ function forecastList(days: readonly DailyForecast[]): string {
         <span class="day-name">${escapeHtml(formatDay(d.date))}</span>
         <span class="day-condition">${escapeHtml(d.condition)}</span>
         <span class="day-range">
-          <strong>${escapeHtml(formatTemp(d.highC))}</strong>
-          <span class="day-low">${escapeHtml(formatTemp(d.lowC))}</span>
+          <strong>${escapeHtml(formatTemp(d.highC, unit))}</strong>
+          <span class="day-low">${escapeHtml(formatTemp(d.lowC, unit))}</span>
         </span>
       </li>`,
     )
@@ -122,10 +132,10 @@ export function renderView(state: ViewState): string {
         'loaded',
         skyFor(state.current.condition),
         `<h1 class="place">${escapeHtml(state.place)}</h1>
-         <p class="temperature">${escapeHtml(formatTemp(state.current.tempC))}</p>
+         <p class="temperature">${escapeHtml(formatTemp(state.current.tempC, state.unit))}</p>
          <p class="condition">${escapeHtml(state.current.condition)}</p>
          ${state.current.windKph === undefined ? '' : `<p class="wind">Wind ${escapeHtml(formatWind(state.current.windKph))}</p>`}
-         ${forecastList(state.forecast)}`,
+         ${forecastList(state.forecast, state.unit)}`,
       );
   }
 }
