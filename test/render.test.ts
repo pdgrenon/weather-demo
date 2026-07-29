@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  celsiusToFahrenheit,
   escapeHtml,
   formatDay,
   formatTemp,
   formatWind,
   renderView,
   skyFor,
+  unitForLocale,
   type ViewState,
 } from '../src/render';
 
@@ -22,7 +24,7 @@ function stateFor(kind: ViewState['kind']): ViewState {
     case 'loading':
       return { kind: 'loading' };
     case 'loaded':
-      return { kind: 'loaded', place: 'San Francisco', current: CURRENT, forecast: FORECAST };
+      return { kind: 'loaded', place: 'San Francisco', current: CURRENT, forecast: FORECAST, unit: 'C' };
     case 'empty':
       return { kind: 'empty', place: 'San Francisco' };
     case 'error':
@@ -81,8 +83,26 @@ test('the error card never renders the raw message payload — stronger than esc
 });
 
 test('temperatures render as whole degrees', () => {
-  assert.equal(formatTemp(18.4), '18°');
-  assert.equal(formatTemp(-0.6), '-1°');
+  assert.equal(formatTemp(18.4, 'C'), '18°C');
+  assert.equal(formatTemp(-0.6, 'C'), '-1°C');
+});
+
+test('celsiusToFahrenheit converts at the freezing and boiling points', () => {
+  assert.equal(celsiusToFahrenheit(0), 32);
+  assert.equal(celsiusToFahrenheit(100), 212);
+});
+
+test('formatTemp renders in Fahrenheit when requested', () => {
+  assert.equal(formatTemp(18.4, 'F'), '65°F');
+  assert.equal(formatTemp(-0.6, 'F'), '31°F');
+});
+
+test('unitForLocale detects US vs non-US locales', () => {
+  assert.equal(unitForLocale('en-US'), 'F');
+  assert.equal(unitForLocale('es-US'), 'F');
+  assert.equal(unitForLocale('en-GB'), 'C');
+  assert.equal(unitForLocale('fr-FR'), 'C');
+  assert.equal(unitForLocale(''), 'C');
 });
 
 test('wind speeds render as whole km/h', () => {
@@ -96,7 +116,7 @@ test('a loaded view with windKph renders the wind', () => {
 });
 
 test('a loaded view without windKph contains no wind element', () => {
-  const html = renderView({ kind: 'loaded', place: 'Test', current: { tempC: 22, condition: 'Clear' }, forecast: [] });
+  const html = renderView({ kind: 'loaded', place: 'Test', current: { tempC: 22, condition: 'Clear' }, forecast: [], unit: 'C' });
   assert.doesNotMatch(html, /Wind/);
   assert.doesNotMatch(html, /<p class="wind">/);
 });
