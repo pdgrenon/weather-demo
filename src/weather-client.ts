@@ -9,6 +9,8 @@
 export interface CurrentWeather {
   tempC: number;
   condition: string;
+  /** Wind speed in km/h. Absent when the provider didn't report it. */
+  windKph?: number;
 }
 
 export interface DailyForecast {
@@ -51,7 +53,7 @@ export function conditionFromCode(code: number): string {
 const API_ROOT = 'https://api.open-meteo.com/v1/forecast';
 
 interface CurrentResponse {
-  current?: { temperature_2m?: number; weather_code?: number };
+  current?: { temperature_2m?: number; weather_code?: number; wind_speed_10m?: number };
 }
 
 interface DailyResponse {
@@ -80,13 +82,18 @@ async function getJson<T>(fetchImpl: typeof fetch, url: string): Promise<T> {
 export function createOpenMeteoClient(fetchImpl: typeof fetch = fetch): WeatherClient {
   return {
     async current(lat, lon) {
-      const url = `${API_ROOT}?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code`;
+      const url = `${API_ROOT}?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code,wind_speed_10m`;
       const body = await getJson<CurrentResponse>(fetchImpl, url);
       const temp = body.current?.temperature_2m;
       if (typeof temp !== 'number') {
         throw new Error('weather response had no current temperature');
       }
-      return { tempC: temp, condition: conditionFromCode(body.current?.weather_code ?? -1) };
+      const wind = body.current?.wind_speed_10m;
+      return {
+        tempC: temp,
+        condition: conditionFromCode(body.current?.weather_code ?? -1),
+        ...(typeof wind === 'number' ? { windKph: wind } : {}),
+      };
     },
 
     async forecast(lat, lon, days) {

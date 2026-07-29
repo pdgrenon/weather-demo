@@ -24,6 +24,10 @@ function fakeFetch(payload: unknown, init: { ok?: boolean; status?: number } = {
 
 const CURRENT_PAYLOAD = { current: { temperature_2m: 18.4, weather_code: 0 } };
 
+const CURRENT_PAYLOAD_WITH_WIND = {
+  current: { temperature_2m: 18.4, weather_code: 0, wind_speed_10m: 11.7 },
+};
+
 const DAILY_PAYLOAD = {
   daily: {
     time: ['2026-07-28', '2026-07-29'],
@@ -40,6 +44,25 @@ test('current() maps the API payload onto CurrentWeather', async () => {
   assert.deepEqual(result, { tempC: 18.4, condition: 'Clear' });
   assert.equal(calls.length, 1);
   assert.match(calls[0] ?? '', /latitude=37\.7749&longitude=-122\.4194/);
+  assert.match(calls[0] ?? '', /current=temperature_2m,weather_code,wind_speed_10m/);
+});
+
+test('current() maps wind_speed_10m onto windKph when present', async () => {
+  const { impl, calls } = fakeFetch(CURRENT_PAYLOAD_WITH_WIND);
+  const result = await createOpenMeteoClient(impl).current(0, 0);
+
+  assert.equal(result.windKph, 11.7);
+  assert.equal(result.tempC, 18.4);
+  assert.match(calls[0] ?? '', /wind_speed_10m/);
+});
+
+test('current() degrades gracefully when wind_speed_10m is absent', async () => {
+  const { impl } = fakeFetch(CURRENT_PAYLOAD);
+  const result = await createOpenMeteoClient(impl).current(0, 0);
+
+  assert.equal(result.tempC, 18.4);
+  assert.equal(result.windKph, undefined);
+  assert.equal('windKph' in result, false);
 });
 
 test('forecast() maps each day, including its condition', async () => {
