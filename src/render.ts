@@ -30,6 +30,11 @@ export function formatTemp(celsius: number): string {
   return `${Math.round(celsius)}°`;
 }
 
+/** Wind speed for display, rounded to whole km/h. */
+export function formatWind(kph: number): string {
+  return `${Math.round(kph)} km/h`;
+}
+
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
 
 /**
@@ -119,6 +124,7 @@ export function renderView(state: ViewState): string {
         `<h1 class="place">${escapeHtml(state.place)}</h1>
          <p class="temperature">${escapeHtml(formatTemp(state.current.tempC))}</p>
          <p class="condition">${escapeHtml(state.current.condition)}</p>
+         ${state.current.windKph === undefined ? '' : `<p class="wind">Wind ${escapeHtml(formatWind(state.current.windKph))}</p>`}
          ${forecastList(state.forecast)}`,
       );
   }

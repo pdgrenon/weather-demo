@@ -5,12 +5,13 @@ import {
   escapeHtml,
   formatDay,
   formatTemp,
+  formatWind,
   renderView,
   skyFor,
   type ViewState,
 } from '../src/render';
 
-const CURRENT = { tempC: 18.4, condition: 'Clear' };
+const CURRENT = { tempC: 18.4, condition: 'Clear', windKph: 11.7 };
 const FORECAST = [
   { date: '2026-08-11', highC: 22.1, lowC: 13.6, condition: 'Clear' },
   { date: '2026-08-12', highC: 19.8, lowC: 12.4, condition: 'Rain' },
@@ -82,6 +83,22 @@ test('the error card never renders the raw message payload — stronger than esc
 test('temperatures render as whole degrees', () => {
   assert.equal(formatTemp(18.4), '18°');
   assert.equal(formatTemp(-0.6), '-1°');
+});
+
+test('wind speeds render as whole km/h', () => {
+  assert.equal(formatWind(11.7), '12 km/h');
+  assert.equal(formatWind(0.3), '0 km/h');
+});
+
+test('a loaded view with windKph renders the wind', () => {
+  const html = renderView(stateFor('loaded'));
+  assert.match(html, /Wind 12 km\/h/);
+});
+
+test('a loaded view without windKph contains no wind element', () => {
+  const html = renderView({ kind: 'loaded', place: 'Test', current: { tempC: 22, condition: 'Clear' }, forecast: [] });
+  assert.doesNotMatch(html, /Wind/);
+  assert.doesNotMatch(html, /<p class="wind">/);
 });
 
 test('weekdays are derived in UTC so they do not shift with the viewer timezone', () => {
