@@ -37,10 +37,16 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
  * local-time parse would render a different day either side of midnight
  * depending on the viewer's timezone.
  */
-export function formatDay(isoDate: string): string {
+export function formatDay(isoDate: string, now: Date = new Date()): string {
   const parsed = new Date(`${isoDate}T00:00:00Z`);
   const day = parsed.getUTCDay();
-  return Number.isNaN(day) ? isoDate : (WEEKDAYS[day] ?? isoDate);
+  if (Number.isNaN(day)) return isoDate;
+
+  const asUtcDay = (d: Date) => Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  const diff = (asUtcDay(parsed) - asUtcDay(now)) / 86_400_000;
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Tomorrow';
+  return WEEKDAYS[day] ?? isoDate;
 }
 
 /**
