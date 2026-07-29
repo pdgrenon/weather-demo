@@ -12,8 +12,8 @@ import {
 
 const CURRENT = { tempC: 18.4, condition: 'Clear' };
 const FORECAST = [
-  { date: '2026-07-28', highC: 22.1, lowC: 13.6, condition: 'Clear' },
-  { date: '2026-07-29', highC: 19.8, lowC: 12.4, condition: 'Rain' },
+  { date: '2026-08-11', highC: 22.1, lowC: 13.6, condition: 'Clear' },
+  { date: '2026-08-12', highC: 19.8, lowC: 12.4, condition: 'Rain' },
 ];
 
 function stateFor(kind: ViewState['kind']): ViewState {
@@ -86,8 +86,14 @@ test('temperatures render as whole degrees', () => {
 });
 
 test('weekdays are derived in UTC so they do not shift with the viewer timezone', () => {
-  assert.equal(formatDay('2026-07-28'), 'Tue');
+  assert.equal(formatDay('2026-07-28', new Date('2026-06-01T12:00:00Z')), 'Tue');
   assert.equal(formatDay('not-a-date'), 'not-a-date');
+  assert.equal(formatDay('not-a-date', new Date('2026-07-28T12:00:00Z')), 'not-a-date');
+  assert.equal(formatDay('2026-07-28', new Date('2026-07-28T12:00:00Z')), 'Today');
+  assert.equal(formatDay('2026-07-29', new Date('2026-07-28T12:00:00Z')), 'Tomorrow');
+  assert.equal(formatDay('2026-07-30', new Date('2026-07-28T12:00:00Z')), 'Thu');
+  assert.equal(formatDay('2026-07-29', new Date('2026-07-29T00:30:00Z')), 'Today');
+  assert.equal(formatDay('2026-07-29', new Date('2026-07-28T23:30:00Z')), 'Tomorrow');
 });
 
 test('conditions map to backdrops, with a neutral fallback', () => {
