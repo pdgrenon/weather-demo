@@ -3,7 +3,7 @@
 
 :root {
   --ink: #10151c;
-  --ink-soft: #46536a;
+  --ink-soft: #33405a;
   --card: rgba(255, 255, 255, 0.82);
   --edge: rgba(16, 21, 28, 0.1);
   --sky-a: #dbe6f2;
@@ -13,7 +13,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --ink: #f2f5f9;
-    --ink-soft: #a3b0c4;
+    --ink-soft: #b3bfd1;
     --card: rgba(20, 26, 36, 0.72);
     --edge: rgba(255, 255, 255, 0.12);
     --sky-a: #131a25;
