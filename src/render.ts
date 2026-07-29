@@ -99,8 +99,8 @@ export function renderView(state: ViewState): string {
         'error',
         'neutral',
         `<h1 class="place">Weather unavailable</h1>
-         <p class="status">${escapeHtml(state.message)}</p>
-         <p class="hint">Check your connection and reload the page.</p>`,
+         <p class="status">We couldn't reach the weather service just now.</p>
+         <p class="hint">This is usually temporary — try reloading in a moment.</p>`,
       );
 
     case 'empty':

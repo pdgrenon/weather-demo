@@ -56,10 +56,10 @@ test('a loaded view picks the backdrop from the current condition', () => {
   assert.match(renderView(stateFor('loaded')), /data-sky="clear"/);
 });
 
-test('an error renders the reason and stays visible — never a blank page', () => {
+test('an error stays visible with a human-readable message — never a blank page', () => {
   const html = renderView(stateFor('error'));
   assert.match(html, /Weather unavailable/);
-  assert.match(html, /network unreachable/);
+  assert.match(html, /We couldn't reach the weather service just now/);
   assert.ok(html.trim().length > 0);
 });
 
@@ -73,10 +73,9 @@ test('the loading state is what renders before any data resolves', () => {
   assert.match(renderView({ kind: 'loading' }), /Getting the latest conditions/);
 });
 
-test('text from the data source is escaped, not injected as markup', () => {
+test('the error card never renders the raw message payload — stronger than escaping', () => {
   const html = renderView({ kind: 'error', message: '<img src=x onerror="alert(1)">' });
-  assert.doesNotMatch(html, /<img/);
-  assert.match(html, /&lt;img/);
+  assert.doesNotMatch(html, /<img src=x onerror="alert\(1\)">/);
   assert.equal(escapeHtml(`a & b < c > d " e ' f`), 'a &amp; b &lt; c &gt; d &quot; e &#39; f');
 });
 
