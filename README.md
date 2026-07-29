@@ -1,6 +1,6 @@
 # Weather
 
-A small web page that shows the current temperature and a three-day forecast
+A small web page that shows the current temperature and a five-day forecast
 for New York City. It fetches live data from [Open-Meteo](https://open-meteo.com),
 a free weather service that needs no account or API key.
 

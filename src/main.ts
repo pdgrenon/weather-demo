@@ -9,7 +9,7 @@ import { openMeteoClient, type WeatherClient } from './weather-client';
 /** Fixed for now; a location picker is a natural next feature. */
 const PLACE = { name: 'New York City', lat: 40.7128, lon: -74.006 } as const;
 
-const FORECAST_DAYS = 3;
+const FORECAST_DAYS = 5;
 
 export async function boot(
   mount: HTMLElement,
