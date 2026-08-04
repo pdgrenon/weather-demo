@@ -3,13 +3,13 @@
  */
 
 import './style.css';
-import { renderView, unitForLocale, type ViewState } from './render';
+import { renderView, type ViewState } from './render';
 import { openMeteoClient, type WeatherClient } from './weather-client';
 
 /** Fixed for now; a location picker is a natural next feature. */
 const PLACE = { name: 'New York City', lat: 40.7128, lon: -74.006 } as const;
 
-const FORECAST_DAYS = 5;
+const FORECAST_DAYS = 3;
 
 export async function boot(
   mount: HTMLElement,
@@ -22,8 +22,6 @@ export async function boot(
       mount.querySelector('[data-sky]')?.getAttribute('data-sky') ?? 'neutral';
   };
 
-  const unit = unitForLocale(navigator.language);
-
   paint({ kind: 'loading' });
 
   try {
@@ -34,7 +32,7 @@ export async function boot(
     paint(
       forecast.length === 0
         ? { kind: 'empty', place: place.name }
-        : { kind: 'loaded', place: place.name, current, forecast, unit },
+        : { kind: 'loaded', place: place.name, current, forecast },
     );
   } catch (err) {
     paint({
