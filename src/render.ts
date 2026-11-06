@@ -11,7 +11,7 @@ export type ViewState =
   | { kind: 'loading' }
   | { kind: 'loaded'; place: string; current: CurrentWeather; forecast: DailyForecast[] }
   | { kind: 'empty'; place: string }
-  | { kind: 'error'; message: string };
+  | { kind: 'error' };
 
 const ESCAPES: Readonly<Record<string, string>> = {
   '&': '&amp;',

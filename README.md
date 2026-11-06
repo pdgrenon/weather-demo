@@ -11,10 +11,12 @@ plain-language **error** if it can't be reached at all. It never shows a blank
 page.
 
 The backdrop changes with the weather — clear skies look different from rain.
+The current wind speed is shown under the temperature whenever the service
+reports it.
 
 ## Running it on your own machine
 
-You'll need [Node.js](https://nodejs.org) version 22 or newer. In a terminal,
+You'll need [Node.js](https://nodejs.org) version 22.12.0 or newer. In a terminal,
 from this folder:
 
 ```
@@ -42,7 +44,8 @@ it can be merged.
 | ---------------------- | --------------------------------------------------------- |
 | `src/weather-client.ts` | Everything that talks to the weather service.             |
 | `src/render.ts`         | Turns weather data into the page's HTML. No network here. |
-| `src/main.ts`           | Starts the app and connects those two.                    |
+| `src/app.ts`            | The app itself: which place it shows and how it moves between the four states. |
+| `src/main.ts`           | Starts the app on the page with the real weather service. |
 | `src/style.css`         | How it looks.                                             |
 
 Keeping the network code in one file is deliberate: it means the rest of the

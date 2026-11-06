@@ -26,7 +26,7 @@ function stateFor(kind: ViewState['kind']): ViewState {
     case 'empty':
       return { kind: 'empty', place: 'San Francisco' };
     case 'error':
-      return { kind: 'error', message: 'network unreachable' };
+      return { kind: 'error' };
   }
 }
 
@@ -74,9 +74,9 @@ test('the loading state is what renders before any data resolves', () => {
   assert.match(renderView({ kind: 'loading' }), /Getting the latest conditions/);
 });
 
-test('the error card never renders the raw message payload — stronger than escaping', () => {
-  const html = renderView({ kind: 'error', message: '<img src=x onerror="alert(1)">' });
-  assert.doesNotMatch(html, /<img src=x onerror="alert\(1\)">/);
+test('the error card is fixed copy and escapeHtml neutralises markup in data', () => {
+  assert.match(renderView({ kind: 'error' }), /We couldn't reach the weather service just now\./);
+  assert.doesNotMatch(escapeHtml('<img src=x onerror="alert(1)">'), /<img/);
   assert.equal(escapeHtml(`a & b < c > d " e ' f`), 'a &amp; b &lt; c &gt; d &quot; e &#39; f');
 });
 
